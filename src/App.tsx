@@ -13,10 +13,11 @@ import { Users } from './pages/users/Users'
 import { UserForm } from './pages/users/UserForm'
 import { Ads } from './pages/ads/Ads'
 import { AdForm } from './pages/ads/AdForm'
+import { Registrations } from './pages/registrations/Registrations'
 import { ComingSoon } from './pages/ComingSoon'
 import { navItems } from './components/layout/navConfig'
 
-const builtPaths = new Set(['/', '/blog-posts', '/events', '/users', '/advertisement'])
+const builtPaths = new Set(['/', '/blog-posts', '/events', '/users', '/advertisement', '/registrations'])
 const placeholderPaths = navItems.map((item) => item.path).filter((path) => !builtPaths.has(path))
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
           <Route path="/advertisement/:id/edit" element={<AdForm />} />
           <Route path="/users/new" element={<UserForm />} />
           <Route path="/users/:id/edit" element={<UserForm />} />
+          <Route path="/registrations" element={<Registrations />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/new" element={<EventForm />} />
           <Route path="/events/:id/edit" element={<EventForm />} />

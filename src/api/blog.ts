@@ -2,17 +2,17 @@ import { api } from './client'
 import type { ApiEnvelope, BlogCategory, BlogPost } from '../types/api'
 
 export async function fetchBlogPosts() {
-  const res = await api.get<ApiEnvelope<BlogPost[]>>('/blog-posts')
+  const res = await api.get<ApiEnvelope<BlogPost[]>>('/admin/blog-posts')
   return res.data.data
 }
 
 export async function fetchBlogPost(id: string) {
-  const res = await api.get<ApiEnvelope<BlogPost>>(`/blog-posts/${id}`)
+  const res = await api.get<ApiEnvelope<BlogPost>>(`/admin/blog-posts/${id}`)
   return res.data.data
 }
 
 export async function fetchBlogCategories() {
-  const res = await api.get<ApiEnvelope<BlogCategory[]>>('/blog-categories')
+  const res = await api.get<ApiEnvelope<BlogCategory[]>>('/admin/blog-categories')
   return res.data.data
 }
 
@@ -31,15 +31,15 @@ export interface BlogPostInput {
 }
 
 export async function createBlogPost(input: BlogPostInput) {
-  const res = await api.post<ApiEnvelope<BlogPost>>('/blog-posts', input)
+  const res = await api.post<ApiEnvelope<BlogPost>>('/admin/blog-posts', input)
   return res.data.data
 }
 
 export async function updateBlogPost(id: string, input: Partial<BlogPostInput>) {
-  const res = await api.patch<ApiEnvelope<BlogPost>>(`/blog-posts/${id}`, input)
+  const res = await api.patch<ApiEnvelope<BlogPost>>(`/admin/blog-posts/${id}`, input)
   return res.data.data
 }
 
 export async function deleteBlogPost(id: string) {
-  await api.delete(`/blog-posts/${id}`)
+  await api.delete(`/admin/blog-posts/${id}`)
 }

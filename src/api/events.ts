@@ -22,31 +22,31 @@ export interface EventInput {
 }
 
 export async function fetchEvents() {
-  const res = await api.get<ApiEnvelope<EventItem[]>>('/events')
+  const res = await api.get<ApiEnvelope<EventItem[]>>('/admin/events')
   return res.data.data
 }
 
 export async function fetchEvent(id: string) {
-  const res = await api.get<ApiEnvelope<EventItem>>(`/events/${id}`)
+  const res = await api.get<ApiEnvelope<EventItem>>(`/admin/events/${id}`)
   return res.data.data
 }
 
 export async function createEvent(input: EventInput) {
-  const res = await api.post<ApiEnvelope<EventItem>>('/events', input)
+  const res = await api.post<ApiEnvelope<EventItem>>('/admin/events', input)
   return res.data.data
 }
 
 export async function updateEvent(id: string, input: Partial<EventInput>) {
-  const res = await api.patch<ApiEnvelope<EventItem>>(`/events/${id}`, input)
+  const res = await api.patch<ApiEnvelope<EventItem>>(`/admin/events/${id}`, input)
   return res.data.data
 }
 
 export async function deleteEvent(id: string) {
-  await api.delete(`/events/${id}`)
+  await api.delete(`/admin/events/${id}`)
 }
 
 /** Registration ("RSVP") count for one event — no bulk-count endpoint exists, so this hits the per-event volunteers list. */
 export async function fetchEventRegistrationCount(eventId: string) {
-  const res = await api.get<ApiEnvelope<unknown[]>>(`/events/${eventId}/volunteers`)
+  const res = await api.get<ApiEnvelope<unknown[]>>(`/admin/events/${eventId}/volunteers`)
   return res.data.data.length
 }

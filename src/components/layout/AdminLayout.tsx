@@ -9,6 +9,7 @@ const titleOverrides: Record<string, string> = {
   '/events': 'Devotional and Seva Events Coordinator',
   '/users': 'Registered Devotees & User Directory',
   '/advertisement': 'Advertisement Management',
+  '/registrations': 'Registrations: Artists, Temples, Dharamshalas & More',
 }
 
 const blogBreadcrumbBase: BreadcrumbItem[] = [{ label: 'Dashboard', to: '/' }, { label: 'Blog Posts', to: '/blog-posts' }]
