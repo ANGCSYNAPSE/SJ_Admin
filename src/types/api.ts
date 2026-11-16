@@ -8,6 +8,9 @@ export interface AdminUser {
   role: UserRole
   isVerified: boolean
   isBlocked?: boolean
+  location?: string | null
+  avatarUrl?: string | null
+  lastLoginAt?: string | null
   createdAt: string
 }
 
@@ -105,6 +108,31 @@ export interface EventItem {
   focusKeywords: string[]
   isIndexed: boolean
   isPublished: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type AdSlot = 'leaderboard' | 'banner' | 'rectangle'
+
+export interface AdItem {
+  id: string
+  title: string | null
+  advertiser: string | null
+  adType: string | null
+  placement: AdSlot
+  page: string | null
+  imageUrl: string
+  linkUrl: string | null
+  ctaLabel: string | null
+  isActive: boolean
+  startsAt: string | null
+  endsAt: string | null
+  impressions: number
+  clicks: number
+  revenueRupees: string | number
+  priority: 'low' | 'medium' | 'high'
+  description: string | null
+  isDraft: boolean
   createdAt: string
   updatedAt: string
 }

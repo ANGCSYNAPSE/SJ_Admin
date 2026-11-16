@@ -1,4 +1,4 @@
-import { Bell, Search } from 'lucide-react'
+import { ArrowLeft, Bell, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
@@ -19,10 +19,23 @@ export function Header({ title, breadcrumb }: { title: string; breadcrumb?: Brea
   const { user } = useAuth()
   const name = user?.fullName ?? 'Admin'
   const roleLabel = user?.role === 'admin' ? 'Chief Administrator' : (user?.role ?? '')
+  // The parent list page: the last breadcrumb entry that links somewhere.
+  const backTo = breadcrumb && breadcrumb.length > 2 ? [...breadcrumb].reverse().find((item) => item.to)?.to : undefined
 
   return (
     <header className="flex h-[70px] shrink-0 items-center justify-between border-b border-header-border bg-white px-8">
-      <div className="min-w-0">
+      <div className="flex min-w-0 items-center gap-3">
+        {backTo && (
+          <Link
+            to={backTo}
+            aria-label="Go back"
+            title="Back"
+            className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-header-border bg-search-bg text-heading transition-colors hover:bg-white hover:text-orange"
+          >
+            <ArrowLeft size={18} />
+          </Link>
+        )}
+        <div className="min-w-0">
         <h1
           className={`truncate font-display font-bold text-maroon ${breadcrumb ? 'text-[24px] leading-tight' : 'text-[26px]'}`}
         >
@@ -44,6 +57,7 @@ export function Header({ title, breadcrumb }: { title: string; breadcrumb?: Brea
             ))}
           </p>
         )}
+        </div>
       </div>
 
       <div className="flex items-center gap-6">

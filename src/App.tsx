@@ -3,20 +3,28 @@ import { AdminLayout } from './components/layout/AdminLayout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { Login } from './pages/auth/Login'
+import { ForgotPassword } from './pages/auth/ForgotPassword'
+import { ResetPassword } from './pages/auth/ResetPassword'
 import { BlogPosts } from './pages/blog/BlogPosts'
 import { BlogPostForm } from './pages/blog/BlogPostForm'
 import { Events } from './pages/events/Events'
 import { EventForm } from './pages/events/EventForm'
+import { Users } from './pages/users/Users'
+import { UserForm } from './pages/users/UserForm'
+import { Ads } from './pages/ads/Ads'
+import { AdForm } from './pages/ads/AdForm'
 import { ComingSoon } from './pages/ComingSoon'
 import { navItems } from './components/layout/navConfig'
 
-const builtPaths = new Set(['/', '/blog-posts', '/events'])
+const builtPaths = new Set(['/', '/blog-posts', '/events', '/users', '/advertisement'])
 const placeholderPaths = navItems.map((item) => item.path).filter((path) => !builtPaths.has(path))
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AdminLayout />}>
@@ -24,6 +32,12 @@ function App() {
           <Route path="/blog-posts" element={<BlogPosts />} />
           <Route path="/blog-posts/new" element={<BlogPostForm />} />
           <Route path="/blog-posts/:id/edit" element={<BlogPostForm />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/advertisement" element={<Ads />} />
+          <Route path="/advertisement/new" element={<AdForm />} />
+          <Route path="/advertisement/:id/edit" element={<AdForm />} />
+          <Route path="/users/new" element={<UserForm />} />
+          <Route path="/users/:id/edit" element={<UserForm />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/new" element={<EventForm />} />
           <Route path="/events/:id/edit" element={<EventForm />} />

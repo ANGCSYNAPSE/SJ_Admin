@@ -9,6 +9,7 @@ import { EventStatusBadge } from '../../components/events/EventStatusBadge'
 import { EventsCalendar } from '../../components/events/EventsCalendar'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import type { EventItem } from '../../types/api'
+import { Loader } from '../../components/ui/Loader'
 
 export function Events() {
   const navigate = useNavigate()
@@ -77,7 +78,7 @@ export function Events() {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted">Loading events…</p>
+    return <Loader label="Loading events…" />
   }
 
   if (error) {

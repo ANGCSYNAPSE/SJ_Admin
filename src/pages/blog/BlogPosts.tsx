@@ -7,6 +7,7 @@ import { formatDate } from '../../lib/format'
 import { StatusBadge } from '../../components/blog/StatusBadge'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import type { BlogCategory, BlogPost } from '../../types/api'
+import { Loader } from '../../components/ui/Loader'
 
 const PAGE_SIZE = 8
 
@@ -87,7 +88,7 @@ export function BlogPosts() {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted">Loading blog posts…</p>
+    return <Loader label="Loading blog posts…" />
   }
 
   if (error) {

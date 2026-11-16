@@ -10,6 +10,7 @@ import { excerptFromHtml, stripHtml } from '../../lib/html'
 import { RichTextEditor } from '../../components/ui/RichTextEditor'
 import { TagInput } from '../../components/ui/TagInput'
 import type { BlogCategory, BlogPost } from '../../types/api'
+import { Loader } from '../../components/ui/Loader'
 
 const labelClass = 'text-[13px] font-semibold text-heading'
 const inputClass =
@@ -132,7 +133,7 @@ export function BlogPostForm() {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted">Loading post…</p>
+    return <Loader label="Loading post…" />
   }
 
   return (

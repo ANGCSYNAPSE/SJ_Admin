@@ -1,15 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Loader } from './ui/Loader'
 
 export function ProtectedRoute() {
   const { user, isLoading } = useAuth()
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-svh items-center justify-center bg-page">
-        <p className="text-sm text-muted">Loading admin panel…</p>
-      </div>
-    )
+    return <Loader fullScreen label="Loading admin panel…" />
   }
 
   if (!user) {

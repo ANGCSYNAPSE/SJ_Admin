@@ -9,6 +9,7 @@ import { stripHtml } from '../../lib/html'
 import { RichTextEditor } from '../../components/ui/RichTextEditor'
 import { TagInput } from '../../components/ui/TagInput'
 import type { EventItem } from '../../types/api'
+import { Loader } from '../../components/ui/Loader'
 
 const labelClass = 'text-[13px] font-semibold text-heading'
 const requiredMark = <span className="text-[#dc3545]">*</span>
@@ -180,7 +181,7 @@ export function EventForm() {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted">Loading event…</p>
+    return <Loader label="Loading event…" />
   }
 
   return (

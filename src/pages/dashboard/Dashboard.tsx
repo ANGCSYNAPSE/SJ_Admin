@@ -18,6 +18,7 @@ import { DonationTrendChart } from '../../components/dashboard/DonationTrendChar
 import { ActivityFeed } from '../../components/dashboard/ActivityFeed'
 import { formatCount, formatRupeesShort } from '../../lib/format'
 import type { DashboardPayload } from '../../types/api'
+import { Loader } from '../../components/ui/Loader'
 
 export function Dashboard() {
   const { user } = useAuth()
@@ -45,7 +46,7 @@ export function Dashboard() {
   }, [])
 
   if (isLoading) {
-    return <p className="text-sm text-muted">Loading dashboard…</p>
+    return <Loader label="Loading dashboard…" />
   }
 
   if (error || !data) {

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import brandLogo from '../../assets/logo.svg'
 import { apiErrorMessage } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
@@ -65,12 +65,9 @@ export function Login() {
               <label htmlFor="password" className="text-xs font-medium text-heading">
                 Password
               </label>
-              <span
-                title="Not wired up yet — needs a password-reset API on the backend"
-                className="cursor-not-allowed text-xs font-medium text-orange/60"
-              >
+              <Link to="/forgot-password" className="text-xs font-medium text-orange hover:underline">
                 Forgot password?
-              </span>
+              </Link>
             </div>
             <div className="relative">
               <input
