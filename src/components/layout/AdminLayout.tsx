@@ -10,6 +10,7 @@ const titleOverrides: Record<string, string> = {
   '/users': 'Registered Devotees & User Directory',
   '/advertisement': 'Advertisement Management',
   '/registrations': 'Registrations: Artists, Temples, Dharamshalas & More',
+  '/profile': 'My Profile',
 }
 
 const blogBreadcrumbBase: BreadcrumbItem[] = [{ label: 'Dashboard', to: '/' }, { label: 'Blog Posts', to: '/blog-posts' }]

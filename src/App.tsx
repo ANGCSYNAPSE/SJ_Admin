@@ -14,6 +14,7 @@ import { UserForm } from './pages/users/UserForm'
 import { Ads } from './pages/ads/Ads'
 import { AdForm } from './pages/ads/AdForm'
 import { Registrations } from './pages/registrations/Registrations'
+import { Profile } from './pages/profile/Profile'
 import { ComingSoon } from './pages/ComingSoon'
 import { navItems } from './components/layout/navConfig'
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/users/new" element={<UserForm />} />
           <Route path="/users/:id/edit" element={<UserForm />} />
           <Route path="/registrations" element={<Registrations />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/new" element={<EventForm />} />
           <Route path="/events/:id/edit" element={<EventForm />} />

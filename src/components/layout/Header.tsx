@@ -1,24 +1,13 @@
 import { ArrowLeft, Bell, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { AccountMenu } from './AccountMenu'
 
 export interface BreadcrumbItem {
   label: string
   to?: string
 }
 
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/)
-  return parts
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}
-
 export function Header({ title, breadcrumb }: { title: string; breadcrumb?: BreadcrumbItem[] }) {
-  const { user } = useAuth()
-  const name = user?.fullName ?? 'Admin'
-  const roleLabel = user?.role === 'admin' ? 'Chief Administrator' : (user?.role ?? '')
   // The parent list page: the last breadcrumb entry that links somewhere.
   const backTo = breadcrumb && breadcrumb.length > 2 ? [...breadcrumb].reverse().find((item) => item.to)?.to : undefined
 
@@ -75,15 +64,7 @@ export function Header({ title, breadcrumb }: { title: string; breadcrumb?: Brea
           <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-orange ring-2 ring-white" />
         </button>
 
-        <div className="flex items-center gap-2.5">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-maroon">
-            <span className="font-display text-base font-bold text-white">{initials(name)}</span>
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-xs font-semibold text-heading">{name}</p>
-            <p className="truncate text-[10px] font-medium text-muted capitalize">{roleLabel}</p>
-          </div>
-        </div>
+        <AccountMenu />
       </div>
     </header>
   )
