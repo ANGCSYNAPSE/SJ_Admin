@@ -58,6 +58,7 @@ export function isImageUrl(value: unknown): value is string {
 
 /** A starting point for the reminder an admin sends to someone with an unfinished profile. */
 export function reminderMessage(name: string, type: RegistrationType, missing: string[]): string {
-  const list = missing.map(fieldLabel).join(', ')
-  return `Hi ${name}, your ${typeLabel[type].toLowerCase()} registration is almost done. Please add the remaining details (${list}) so our team can review it.`
+  // Short on purpose: it appears as a toast. The full list is one click away in the person's profile.
+  const n = missing.length
+  return `Hi ${name}, ${n} detail${n === 1 ? '' : 's'} still to add to your ${typeLabel[type].toLowerCase()} registration. Open your profile to see the list.`
 }
