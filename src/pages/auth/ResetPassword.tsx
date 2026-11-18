@@ -86,10 +86,10 @@ export function ResetPassword() {
         icon={<TriangleAlert size={26} />}
       >
         <Link
-          to="/forgot-password"
+          to="/login"
           className="block rounded-lg bg-orange py-2.5 text-center text-sm font-semibold text-white hover:opacity-90"
         >
-          Request a new link
+          Back to sign in
         </Link>
       </AuthCard>
     )
@@ -127,8 +127,8 @@ export function ResetPassword() {
           <p className="text-xs text-red-600">
             {error}{' '}
             {/expired|invalid/i.test(error) && (
-              <Link to="/forgot-password" className="font-semibold underline">
-                Request a new link
+              <Link to="/login" className="font-semibold underline">
+                Back to sign in
               </Link>
             )}
           </p>

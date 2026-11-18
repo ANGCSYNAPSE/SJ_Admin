@@ -8,6 +8,8 @@ interface AuthContextValue {
   isLoading: boolean
   login: (email: string, password: string, remember?: boolean) => Promise<void>
   logout: () => Promise<void>
+  /** Re-reads the signed-in admin (after their details changed). */
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -47,6 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(result.user)
   }, [])
 
+  const refreshUser = useCallback(async () => {
+    try {
+      setUser(await fetchMe())
+    } catch {
+      /* keep what we have */
+    }
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       await logoutRequest()
@@ -56,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  return <AuthContext.Provider value={{ user, isLoading, login, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, isLoading, login, logout, refreshUser }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

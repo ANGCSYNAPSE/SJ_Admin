@@ -1,7 +1,21 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import type { ApiEnvelope, AuthResult } from '../types/api'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL
+/**
+ * VITE_API_BASE_URL should be the full address, e.g. https://ssj-backend-seven.vercel.app/api/v1. A value
+ * missing "https://" is read by the browser as a path on the admin's own site (requests then go to
+ * <admin>/ssj-backend-seven.vercel.app/... and fail with 405), so the protocol and the /api/v1 suffix are
+ * filled in when they were left out.
+ */
+function normalizeBaseUrl(raw: string | undefined): string {
+  let value = (raw ?? '').trim().replace(/\/+$/, '')
+  if (!value) return value
+  if (!/^https?:\/\//i.test(value)) value = `${/^(localhost|127\.0\.0\.1)/i.test(value) ? 'http' : 'https'}://${value}`
+  if (!/\/api\/v1$/i.test(value)) value = `${value}/api/v1`
+  return value
+}
+
+const baseURL = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL)
 
 /** Origin the backend serves static /uploads from (baseURL minus the /api/v1 suffix). */
 export const apiOrigin = baseURL.replace(/\/api\/v1\/?$/, '')
@@ -78,4 +92,11 @@ export function apiErrorMessage(error: unknown, fallback = 'Something went wrong
     if (data?.message) return data.message
   }
   return fallback
+}
+
+/** The message plus the per-field messages of a rejected request, e.g. { currentPassword: "…not right." }. */
+export function apiFieldErrors(error: unknown): Record<string, string> {
+  if (!axios.isAxiosError(error)) return {}
+  const data = error.response?.data as { errors?: { field: string; message: string }[] | null } | undefined
+  return Object.fromEntries((data?.errors ?? []).map((e) => [e.field, e.message]))
 }

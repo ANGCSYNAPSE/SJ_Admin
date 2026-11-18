@@ -3,7 +3,7 @@ import { AdminLayout } from './components/layout/AdminLayout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { Login } from './pages/auth/Login'
-import { ForgotPassword } from './pages/auth/ForgotPassword'
+// import { ForgotPassword } from './pages/auth/ForgotPassword' // removed for now
 import { ResetPassword } from './pages/auth/ResetPassword'
 import { BlogPosts } from './pages/blog/BlogPosts'
 import { BlogPostForm } from './pages/blog/BlogPostForm'
@@ -26,7 +26,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
       <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route element={<ProtectedRoute />}>

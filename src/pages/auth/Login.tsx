@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import brandLogo from '../../assets/logo.svg'
 import { apiErrorMessage } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
@@ -65,9 +65,11 @@ export function Login() {
               <label htmlFor="password" className="text-xs font-medium text-heading">
                 Password
               </label>
+              {/* "Forgot password?" link: removed for now
               <Link to="/forgot-password" className="text-xs font-medium text-orange hover:underline">
                 Forgot password?
               </Link>
+              */}
             </div>
             <div className="relative">
               <input
