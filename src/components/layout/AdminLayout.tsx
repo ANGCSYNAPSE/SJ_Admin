@@ -10,6 +10,7 @@ const titleOverrides: Record<string, string> = {
   '/users': 'Registered Devotees & User Directory',
   '/advertisement': 'Advertisement Management',
   '/registrations': 'Registrations: Artists, Temples, Dharamshalas & More',
+  '/payments': 'Registration Fee: Collected, Pending & Settings',
   '/profile': 'My Profile',
 }
 

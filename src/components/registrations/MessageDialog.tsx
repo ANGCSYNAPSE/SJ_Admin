@@ -19,6 +19,7 @@ const kinds: { value: NotificationKind; label: string; hint: string }[] = [
 const links = [
   { value: '', label: 'No link' },
   { value: '/complete-profile', label: 'Complete-profile page' },
+  { value: '/profile', label: 'My profile (pay the fee)' },
   { value: '/', label: 'Home page' },
 ]
 

@@ -6,6 +6,7 @@ import {
   Folder,
   Heart,
   Home,
+  IndianRupee,
   Mail,
   Megaphone,
   MessageSquare,
@@ -41,5 +42,6 @@ export const navItems: NavItem[] = [
   { label: 'Users', path: '/users', icon: User },
   { label: 'Contact Inquiries', path: '/contact-inquiries', icon: Mail },
   { label: 'Registrations', path: '/registrations', icon: FileText },
+  { label: 'Payments', path: '/payments', icon: IndianRupee },
   { label: 'Settings', path: '/settings', icon: Settings },
 ]
