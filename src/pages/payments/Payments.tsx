@@ -19,6 +19,7 @@ import {
   fetchOwing,
   fetchPaymentSummary,
   fetchPayments,
+  reconcilePayment,
   recordManualPayment,
   saveFeeSettings,
   type Diagnostics,
@@ -374,15 +375,31 @@ function AllPayments() {
   const [search, setSearch] = useState('')
   const [q, setQ] = useState('')
   const [page, setPage] = useState(1)
+  const toast = useToast()
   const [data, setData] = useState<Page<PaymentRow> | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [reload, setReload] = useState(0)
+  const [reconciling, setReconciling] = useState<string | null>(null)
 
   useEffect(() => {
     setError(null)
     fetchPayments({ status: status || undefined, plan: plan || undefined, q: q || undefined, page, limit: PAGE_SIZE })
       .then(setData)
       .catch((e) => setError(apiErrorMessage(e, 'Could not load the payments.')))
-  }, [status, plan, q, page])
+  }, [status, plan, q, page, reload])
+
+  async function reconcile(id: string) {
+    setReconciling(id)
+    try {
+      const result = await reconcilePayment(id)
+      toast.success(result.message)
+      setReload((n) => n + 1)
+    } catch (e) {
+      toast.error(apiErrorMessage(e, 'Could not reconcile this payment.'))
+    } finally {
+      setReconciling(null)
+    }
+  }
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -426,6 +443,7 @@ function AllPayments() {
                 <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Receipt / Razorpay id</th>
+                <th className="px-4 py-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -450,11 +468,25 @@ function AllPayments() {
                     <p>{p.razorpayPaymentId ?? p.razorpayOrderId}</p>
                     {p.note && <p className="text-body">{p.note}</p>}
                   </td>
+                  <td className="px-4 py-3 text-right">
+                    {p.status === 'created' && p.source === 'razorpay' && (
+                      <button
+                        type="button"
+                        onClick={() => reconcile(p.id)}
+                        disabled={reconciling === p.id}
+                        title="Ask Razorpay whether this payment was really made"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-card-border-alt px-2.5 py-1.5 font-semibold text-heading hover:bg-search-bg disabled:opacity-60"
+                      >
+                        {reconciling === p.id && <Loader2 size={12} className="animate-spin" />}
+                        Reconcile
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
               {data.items.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-muted">
+                  <td colSpan={7} className="px-4 py-10 text-center text-muted">
                     No payments match.
                   </td>
                 </tr>

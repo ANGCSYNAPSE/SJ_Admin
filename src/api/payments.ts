@@ -106,3 +106,9 @@ export async function fetchPayments(params: { status?: string; plan?: string; q?
 export async function recordManualPayment(input: { userId: string; amount: number; reference: string; note?: string }) {
   return (await api.post<ApiEnvelope<PaymentRow>>('/admin/payments/manual', input)).data.data
 }
+
+/** Asks Razorpay what happened to a payment stuck as "not finished": marks it paid if money was captured, else abandoned. */
+export async function reconcilePayment(id: string) {
+  const res = await api.post<ApiEnvelope<PaymentRow> & { message: string }>(`/admin/payments/${id}/reconcile`)
+  return { payment: res.data.data, message: res.data.message }
+}
