@@ -1,5 +1,6 @@
 import {
   Award,
+  Bell,
   Building,
   Calendar,
   FileText,
@@ -43,5 +44,6 @@ export const navItems: NavItem[] = [
   { label: 'Contact Inquiries', path: '/contact-inquiries', icon: Mail },
   { label: 'Registrations', path: '/registrations', icon: FileText },
   { label: 'Payments', path: '/payments', icon: IndianRupee },
+  { label: 'Notifications', path: '/notifications', icon: Bell },
   { label: 'Settings', path: '/settings', icon: Settings },
 ]
