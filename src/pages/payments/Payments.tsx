@@ -33,6 +33,7 @@ import { apiErrorMessage } from '../../api/client'
 import { formatDate, formatDateTime } from '../../lib/format'
 import { typeLabel } from '../../lib/registrations'
 import { MessageDialog, type Recipient } from '../../components/registrations/MessageDialog'
+import { RefundDialog } from '../../components/payments/RefundDialog'
 import { Loader } from '../../components/ui/Loader'
 import { useToast } from '../../components/ui/Toast'
 import type { RegistrationType } from '../../types/api'
@@ -380,6 +381,7 @@ function AllPayments() {
   const [error, setError] = useState<string | null>(null)
   const [reload, setReload] = useState(0)
   const [reconciling, setReconciling] = useState<string | null>(null)
+  const [refunding, setRefunding] = useState<PaymentRow | null>(null)
 
   useEffect(() => {
     setError(null)
@@ -457,7 +459,10 @@ function AllPayments() {
                     <p className="font-semibold text-heading">{p.fullName}</p>
                     <p className="text-muted">{p.email}</p>
                   </td>
-                  <td className="px-4 py-3 font-semibold text-heading">{rupees(p.amount)}</td>
+                  <td className="px-4 py-3 font-semibold text-heading">
+                    {rupees(p.amount)}
+                    {p.refunded > 0 && <p className="text-[11px] font-semibold text-red-600">{rupees(p.refunded)} refunded</p>}
+                  </td>
                   <td className="px-4 py-3 capitalize text-body">{p.plan === 'full' ? 'clears balance' : p.plan === 'manual' ? 'offline' : 'part'}</td>
                   <td className="px-4 py-3">
                     <Pill tone={statusTone(p.status)}>{p.status === 'created' ? 'not finished' : p.status}</Pill>
@@ -481,6 +486,15 @@ function AllPayments() {
                         Reconcile
                       </button>
                     )}
+                    {p.status === 'paid' && p.refunded < p.amount && (
+                      <button
+                        type="button"
+                        onClick={() => setRefunding(p)}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-card-border-alt px-2.5 py-1.5 font-semibold text-heading hover:bg-search-bg"
+                      >
+                        Refund
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -496,6 +510,7 @@ function AllPayments() {
           <Pager page={page} total={data.total} onPage={setPage} />
         </div>
       )}
+      {refunding && <RefundDialog payment={refunding} onClose={() => setRefunding(null)} onDone={() => setReload((n) => n + 1)} />}
     </div>
   )
 }

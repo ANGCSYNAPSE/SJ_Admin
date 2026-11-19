@@ -1,5 +1,6 @@
-import { ArrowLeft, Bell, Search } from 'lucide-react'
+import { ArrowLeft, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { NotificationBell } from './NotificationBell'
 import { AccountMenu } from './AccountMenu'
 
 export interface BreadcrumbItem {
@@ -59,10 +60,7 @@ export function Header({ title, breadcrumb }: { title: string; breadcrumb?: Brea
           />
         </div>
 
-        <button type="button" className="relative text-heading" aria-label="Notifications">
-          <Bell size={20} />
-          <span className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-orange ring-2 ring-white" />
-        </button>
+        <NotificationBell />
 
         <AccountMenu />
       </div>

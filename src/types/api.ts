@@ -6,7 +6,10 @@ export interface AdminUser {
   email: string
   mobile: string
   role: UserRole
+  /** An admin has checked this account. */
   isVerified: boolean
+  emailVerified?: boolean
+  mobileVerified?: boolean
   isBlocked?: boolean
   location?: string | null
   avatarUrl?: string | null

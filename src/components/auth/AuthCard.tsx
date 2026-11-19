@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import brandLogo from '../../assets/logo.svg'
+import brandLogo from '../../assets/logo.png'
 
 interface AuthCardProps {
   title: string

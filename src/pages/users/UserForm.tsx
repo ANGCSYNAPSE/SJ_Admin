@@ -7,6 +7,7 @@ import { apiErrorMessage, resolveUploadUrl } from '../../api/client'
 import { roleLabel, userStatus } from '../../lib/users'
 import type { AdminUser, UserRole } from '../../types/api'
 import { Loader } from '../../components/ui/Loader'
+import { UserVerificationCard } from '../../components/verification/UserVerificationCard'
 
 const labelClass = 'text-[13px] font-semibold text-heading'
 const inputClass =
@@ -220,6 +221,7 @@ export function UserForm() {
 
   return (
     <div className="flex flex-col gap-6 rounded-2xl border border-header-border bg-white p-8">
+      {isEdit && id && <UserVerificationCard userId={id} />}
       <div className="flex items-start gap-6">
         <div className="flex flex-1 flex-col gap-5">
           <div className="flex flex-col gap-1.5">

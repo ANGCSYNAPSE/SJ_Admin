@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import brandLogo from '../../assets/logo.svg'
+import brandLogo from '../../assets/logo.png'
 import { apiErrorMessage } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 

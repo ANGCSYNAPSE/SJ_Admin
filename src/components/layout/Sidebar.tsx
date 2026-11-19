@@ -1,6 +1,6 @@
 import { LogOut } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
-import brandLogo from '../../assets/logo-footer.svg'
+import brandLogo from '../../assets/logo-footer.png'
 import { useAuth } from '../../context/AuthContext'
 import { navItems } from './navConfig'
 
@@ -10,7 +10,7 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-sidebar-border bg-sidebar ">
       <div className="flex flex-col items-center gap-2.5 px-5 py-4">
-        <div className="h-30 w-auto overflow-hidden">
+        <div className="size-30 overflow-hidden">
           <img src={brandLogo} alt="Shyam Jagat" className="size-full object-cover" />
         </div>
       </div>

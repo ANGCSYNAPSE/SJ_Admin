@@ -113,8 +113,8 @@ const staticLinks = [
 ]
 
 type AudienceMode = 'all' | 'segment' | 'users'
-type Segment = { fee: '' | 'paid' | 'partial' | 'unpaid'; categories: RegistrationType[]; profile: '' | 'incomplete' | 'complete'; registration: '' | 'none' | 'any' }
-const emptySegment: Segment = { fee: '', categories: [], profile: '', registration: '' }
+type Segment = { fee: '' | 'paid' | 'partial' | 'unpaid'; categories: RegistrationType[]; profile: '' | 'incomplete' | 'complete'; registration: '' | 'none' | 'any'; verified: '' | 'yes' | 'no' }
+const emptySegment: Segment = { fee: '', categories: [], profile: '', registration: '', verified: '' }
 
 const categoryList = Object.keys(typeLabel) as RegistrationType[]
 
@@ -126,6 +126,7 @@ function buildAudience(mode: AudienceMode, segment: Segment, people: AdminUser[]
   if (segment.categories.length) s.categories = segment.categories
   if (segment.profile) s.profile = segment.profile
   if (segment.registration) s.registration = segment.registration
+  if (segment.verified) s.verified = segment.verified
   return Object.keys(s).length ? { mode: 'segment', segment: s } : null
 }
 
@@ -141,6 +142,7 @@ function describeAudience(a: Audience, names?: Record<string, string>): string {
   if (s.categories?.length) parts.push(`registered as ${s.categories.map((c) => typeLabel[c].toLowerCase()).join(' / ')}`)
   if (s.profile) parts.push(s.profile === 'incomplete' ? 'profile incomplete' : 'profile complete')
   if (s.registration) parts.push(s.registration === 'none' ? 'plain members' : 'any registration')
+  if (s.verified) parts.push(s.verified === 'yes' ? 'verified by admin' : 'not verified by admin')
   return parts.join(', ')
 }
 
@@ -506,6 +508,15 @@ function Compose({ onSent }: { onSent: () => void }) {
                 <div className="flex flex-wrap gap-2">
                   {([['', 'Either'], ['any', 'Registered in a category'], ['none', 'Plain members only']] as const).map(([v, l]) => (
                     <Chip key={v} active={segment.registration === v} onClick={() => setSegment({ ...segment, registration: v })}>
+                      {l}
+                    </Chip>
+                  ))}
+                </div>
+              </Field>
+              <Field label="Admin verification">
+                <div className="flex flex-wrap gap-2">
+                  {([['', 'Either'], ['no', 'Not verified yet'], ['yes', 'Verified']] as const).map(([v, l]) => (
+                    <Chip key={v} active={segment.verified === v} onClick={() => setSegment({ ...segment, verified: v })}>
                       {l}
                     </Chip>
                   ))}

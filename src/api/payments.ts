@@ -32,6 +32,8 @@ export interface PaymentRow {
   mobile: string
   plan: PaymentKind
   amount: number
+  /** How much of it has gone back to the payer. */
+  refunded: number
   status: PaymentStatus
   source: 'razorpay' | 'manual'
   receipt: string
@@ -111,4 +113,10 @@ export async function recordManualPayment(input: { userId: string; amount: numbe
 export async function reconcilePayment(id: string) {
   const res = await api.post<ApiEnvelope<PaymentRow> & { message: string }>(`/admin/payments/${id}/reconcile`)
   return { payment: res.data.data, message: res.data.message }
+}
+
+/** Refunds all (leave `amount` out) or part of a paid payment. Razorpay payments are refunded through Razorpay. */
+export async function refundPayment(id: string, input: { amount?: number; reason: string }) {
+  const res = await api.post<ApiEnvelope<{ belowMinimum: boolean }> & { message: string }>(`/admin/payments/${id}/refund`, input)
+  return { message: res.data.message, belowMinimum: res.data.data.belowMinimum }
 }

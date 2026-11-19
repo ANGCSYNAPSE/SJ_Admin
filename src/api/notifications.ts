@@ -34,6 +34,7 @@ export type Audience =
         categories?: RegistrationType[]
         profile?: 'incomplete' | 'complete'
         registration?: 'none' | 'any'
+        verified?: 'yes' | 'no'
       }
     }
   | { mode: 'users'; userIds: string[] }
