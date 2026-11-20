@@ -101,7 +101,7 @@ export async function fetchOwing(params: { state?: string; q?: string; page: num
   return (await api.get<ApiEnvelope<Page<OwingUser>>>('/admin/payments/pending', { params })).data.data
 }
 
-export async function fetchPayments(params: { status?: string; plan?: string; q?: string; page: number; limit: number }) {
+export async function fetchPayments(params: { status?: string; plan?: string; q?: string; userId?: string; page: number; limit: number }) {
   return (await api.get<ApiEnvelope<Page<PaymentRow>>>('/admin/payments', { params })).data.data
 }
 
@@ -119,4 +119,10 @@ export async function reconcilePayment(id: string) {
 export async function refundPayment(id: string, input: { amount?: number; reason: string }) {
   const res = await api.post<ApiEnvelope<{ belowMinimum: boolean }> & { message: string }>(`/admin/payments/${id}/refund`, input)
   return { message: res.data.message, belowMinimum: res.data.data.belowMinimum }
+}
+
+/** Refunds some or all of everything one person has paid, newest payments first. Leave `amount` out for the lot. */
+export async function refundFee(input: { userId: string; amount?: number; reason: string }) {
+  const res = await api.post<ApiEnvelope<{ total: number; belowMinimum: boolean }> & { message: string }>('/admin/payments/refund-fee', input)
+  return { message: res.data.message, total: res.data.data.total, belowMinimum: res.data.data.belowMinimum }
 }

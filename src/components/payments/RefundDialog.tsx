@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Loader2, Undo2, X } from 'lucide-react'
-import { refundPayment, type PaymentRow } from '../../api/payments'
+import { fetchPayments, refundFee, refundPayment, type PaymentRow } from '../../api/payments'
 import { apiErrorMessage } from '../../api/client'
 import { useToast } from '../ui/Toast'
 
@@ -11,8 +11,29 @@ const inputClass =
 /** Refund all or part of a paid registration fee. Razorpay payments go back to the customer's own account. */
 export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow; onClose: () => void; onDone: () => void }) {
   const toast = useToast()
-  const left = Math.round((payment.amount - (payment.refunded ?? 0)) * 100) / 100
-  const [amount, setAmount] = useState(String(left))
+  const leftOnThis = Math.round((payment.amount - (payment.refunded ?? 0)) * 100) / 100
+
+  // Everything this person has paid: a fee is often paid in parts, and the admin may want to give it all back.
+  const [others, setOthers] = useState<PaymentRow[] | null>(null)
+  useEffect(() => {
+    fetchPayments({ status: 'paid', userId: payment.userId ?? undefined, page: 1, limit: 50 })
+      .then((page) => setOthers(page.items))
+      .catch(() => setOthers([]))
+  }, [payment.userId])
+  const refundable = (others ?? []).filter((p) => p.amount - (p.refunded ?? 0) > 0)
+  const leftOnAll = Math.round(refundable.reduce((sum, p) => sum + (p.amount - (p.refunded ?? 0)), 0) * 100) / 100
+  const canRefundAll = refundable.length > 1 && payment.userId !== null
+  const [scope, setScope] = useState<'one' | 'all'>('one')
+  const left = scope === 'all' ? leftOnAll : leftOnThis
+  const [amount, setAmount] = useState(String(leftOnThis))
+  // Once the person's other payments are known, offer to refund the whole fee by default.
+  useEffect(() => {
+    if (canRefundAll) {
+      setScope('all')
+      setAmount(String(leftOnAll))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canRefundAll, leftOnAll])
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,7 +52,10 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
     setBusy(true)
     setError(null)
     try {
-      const res = await refundPayment(payment.id, { amount: value === left ? undefined : value, reason: reason.trim() })
+      const res =
+        scope === 'all' && payment.userId
+          ? await refundFee({ userId: payment.userId, amount: value === left ? undefined : value, reason: reason.trim() })
+          : await refundPayment(payment.id, { amount: value === left ? undefined : value, reason: reason.trim() })
       toast.success(res.message)
       if (res.belowMinimum) toast.success('They are now below the minimum fee. You may want to un-verify or message them.')
       onDone()
@@ -54,7 +78,7 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
             <div>
               <p className="font-display text-xl font-bold text-maroon">Refund payment</p>
               <p className="text-[13px] text-body">
-                {payment.fullName} paid {rupees(payment.amount)}
+                {payment.fullName} paid {rupees(payment.amount)} in this payment
                 {payment.refunded > 0 && ` (${rupees(payment.refunded)} already refunded)`}
               </p>
             </div>
@@ -63,6 +87,32 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
             <X size={18} />
           </button>
         </div>
+
+        {canRefundAll && (
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="What to refund">
+            {(
+              [
+                ['all', `Everything ${payment.fullName.split(' ')[0]} paid`, `${rupees(leftOnAll)} across ${refundable.length} payments`],
+                ['one', 'Only this payment', rupees(leftOnThis)],
+              ] as const
+            ).map(([value, title, hint]) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={scope === value}
+                onClick={() => {
+                  setScope(value)
+                  setAmount(String(value === 'all' ? leftOnAll : leftOnThis))
+                }}
+                className={`rounded-lg border px-3 py-2 text-left transition-colors ${scope === value ? 'border-orange bg-[#fff1e6]' : 'border-card-border hover:border-orange/50'}`}
+              >
+                <p className="text-[13px] font-semibold text-heading">{title}</p>
+                <p className="text-[11px] text-muted">{hint}</p>
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-heading" htmlFor="refund-amount">
