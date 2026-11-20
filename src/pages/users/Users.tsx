@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowUpRight, ChevronDown, Home, MessageSquare, MoreHorizontal, Shield, SquarePen, Trash2, User, type LucideIcon } from 'lucide-react'
 import { deleteUser, fetchUsers, setUserBlocked } from '../../api/users'
-import { apiErrorMessage } from '../../api/client'
+import { apiErrorMessage, resolveUploadUrl } from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { formatDate } from '../../lib/format'
 import { formatLastActive, roleLabel, userStatus, usersToCsv, type UserStatus } from '../../lib/users'
@@ -62,6 +62,7 @@ function pageList(current: number, total: number): (number | 'gap')[] {
 
 export function Users() {
   const { user: currentUser } = useAuth()
+  const navigate = useNavigate()
   const [users, setUsers] = useState<AdminUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -298,7 +299,15 @@ export function Users() {
           <p className="px-6 py-10 text-center text-sm text-muted">No users match these filters.</p>
         ) : (
           pageItems.map((u) => (
-            <div key={u.id} className="flex items-center border-b border-card-border-alt px-6 py-3">
+            <div
+              key={u.id}
+              role="link"
+              tabIndex={0}
+              title="Open this person's profile"
+              onClick={(e) => !(e.target as HTMLElement).closest('button, a, input') && navigate(`/users/${u.id}`)}
+              onKeyDown={(e) => e.key === 'Enter' && !(e.target as HTMLElement).closest('button, a, input') && navigate(`/users/${u.id}`)}
+              className="flex cursor-pointer items-center border-b border-card-border-alt px-6 py-3 transition-colors hover:bg-[#fffbf3] focus:bg-[#fffbf3] focus:outline-none"
+            >
               <div className="flex w-10 shrink-0 items-center">
                 <button
                   type="button"
@@ -307,7 +316,14 @@ export function Users() {
                   className={`size-[18px] rounded border-2 ${selected.has(u.id) ? 'border-orange bg-orange' : 'border-[#999] bg-transparent'}`}
                 />
               </div>
-              <p className="flex-1 truncate pr-3 text-sm font-semibold text-heading">{u.fullName}</p>
+              <div className="flex min-w-0 flex-1 items-center gap-3 pr-3">
+                {u.avatarUrl ? (
+                  <img src={resolveUploadUrl(u.avatarUrl) ?? undefined} alt="" className="size-8 shrink-0 rounded-full object-cover" />
+                ) : (
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#fde9c8] text-xs font-bold text-maroon">{u.fullName.trim().charAt(0).toUpperCase()}</span>
+                )}
+                <p className="truncate text-sm font-semibold text-heading">{u.fullName}</p>
+              </div>
               <p className="w-[220px] shrink-0 truncate pr-3 text-sm text-[#444]">{u.email}</p>
               <p className="w-[150px] shrink-0 text-sm text-[#444]">{u.mobile}</p>
               <p className="w-40 shrink-0 text-sm text-heading">{roleLabel[u.role]}</p>

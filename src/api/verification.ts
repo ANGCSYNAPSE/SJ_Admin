@@ -2,6 +2,7 @@ import { api } from './client'
 import type { ApiEnvelope, RegistrationType } from '../types/api'
 
 export interface VerificationRegistration {
+  id: string
   type: RegistrationType
   status: string
   name: string
@@ -21,6 +22,8 @@ export interface VerificationItem {
   emailVerifiedAt?: string | null
   mobileVerified: boolean
   mobileVerifiedAt?: string | null
+  /** Signed in with Google at least once. */
+  googleLinked?: boolean
   verifiedAt: string | null
   verifiedBy: string | null
   createdAt: string

@@ -34,6 +34,8 @@ import { formatDate, formatDateTime } from '../../lib/format'
 import { typeLabel } from '../../lib/registrations'
 import { MessageDialog, type Recipient } from '../../components/registrations/MessageDialog'
 import { RefundDialog } from '../../components/payments/RefundDialog'
+import { DocumentButtons, DocumentPreview } from '../../components/payments/DocumentPreview'
+import { fetchPaymentDocument, saveBlob, type DocumentKind } from '../../api/documents'
 import { Loader } from '../../components/ui/Loader'
 import { useToast } from '../../components/ui/Toast'
 import type { RegistrationType } from '../../types/api'
@@ -382,6 +384,7 @@ function AllPayments() {
   const [reload, setReload] = useState(0)
   const [reconciling, setReconciling] = useState<string | null>(null)
   const [refunding, setRefunding] = useState<PaymentRow | null>(null)
+  const [doc, setDoc] = useState<{ id: string; kind: DocumentKind; title: string; fileName: string } | null>(null)
 
   useEffect(() => {
     setError(null)
@@ -486,6 +489,15 @@ function AllPayments() {
                         Reconcile
                       </button>
                     )}
+                    {p.status === 'paid' && (
+                      <span className="mr-2 inline-block align-middle">
+                        <DocumentButtons
+                          label="Receipt"
+                          onPreview={() => setDoc({ id: p.id, kind: 'receipt', title: `Receipt for ${p.fullName}`, fileName: `Shyam-Jagat-Receipt-${p.receipt}` })}
+                          onDownload={() => fetchPaymentDocument(p.id, 'receipt').then((b) => saveBlob(b, `Shyam-Jagat-Receipt-${p.receipt}`)).catch((e) => toast.error(apiErrorMessage(e, 'Could not download this receipt.')))}
+                        />
+                      </span>
+                    )}
                     {p.status === 'paid' && p.refunded < p.amount && (
                       <button
                         type="button"
@@ -510,6 +522,7 @@ function AllPayments() {
           <Pager page={page} total={data.total} onPage={setPage} />
         </div>
       )}
+      {doc && <DocumentPreview title={doc.title} fileName={doc.fileName} load={() => fetchPaymentDocument(doc.id, doc.kind)} onClose={() => setDoc(null)} />}
       {refunding && <RefundDialog payment={refunding} onClose={() => setRefunding(null)} onDone={() => setReload((n) => n + 1)} />}
     </div>
   )

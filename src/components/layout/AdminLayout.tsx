@@ -38,6 +38,9 @@ function headerForPath(pathname: string): { title: string; breadcrumb?: Breadcru
   if (/^\/blog-posts\/[^/]+\/edit$/.test(pathname)) {
     return { title: 'Edit Blog Post', breadcrumb: [...blogBreadcrumbBase, { label: 'Edit' }] }
   }
+  if (/^\/users\/[^/]+$/.test(pathname) && pathname !== '/users/new') {
+    return { title: 'User Profile', breadcrumb: [...usersBreadcrumbBase, { label: 'Profile' }] }
+  }
   if (pathname === '/users/new') {
     return { title: 'Add New User', breadcrumb: [...usersBreadcrumbBase, { label: 'Add New' }] }
   }

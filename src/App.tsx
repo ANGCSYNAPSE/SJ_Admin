@@ -18,6 +18,7 @@ import { Profile } from './pages/profile/Profile'
 import { Payments } from './pages/payments/Payments'
 import { Notifications } from './pages/notifications/Notifications'
 import { Verification } from './pages/verification/Verification'
+import { UserDetail } from './pages/users/UserDetail'
 import { ComingSoon } from './pages/ComingSoon'
 import { navItems } from './components/layout/navConfig'
 
@@ -42,6 +43,7 @@ function App() {
           <Route path="/advertisement/new" element={<AdForm />} />
           <Route path="/advertisement/:id/edit" element={<AdForm />} />
           <Route path="/users/new" element={<UserForm />} />
+          <Route path="/users/:id" element={<UserDetail />} />
           <Route path="/users/:id/edit" element={<UserForm />} />
           <Route path="/registrations" element={<Registrations />} />
           <Route path="/payments" element={<Payments />} />

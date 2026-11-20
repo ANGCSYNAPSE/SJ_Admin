@@ -34,11 +34,11 @@ const toneClass = {
   neutral: 'border border-header-border bg-white text-heading hover:bg-search-bg',
 }
 
-function isBlank(value: unknown): boolean {
+export function isBlank(value: unknown): boolean {
   return value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)
 }
 
-function Value({ field, value }: { field: string; value: unknown }) {
+export function Value({ field, value }: { field: string; value: unknown }) {
   if (typeof value === 'boolean') return <span>{value ? 'Yes' : 'No'}</span>
   if (Array.isArray(value)) {
     const urls = value.filter(isHttpUrl)
