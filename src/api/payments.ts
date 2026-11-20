@@ -116,13 +116,48 @@ export async function reconcilePayment(id: string) {
 }
 
 /** Refunds all (leave `amount` out) or part of a paid payment. Razorpay payments are refunded through Razorpay. */
-export async function refundPayment(id: string, input: { amount?: number; reason: string }) {
-  const res = await api.post<ApiEnvelope<{ belowMinimum: boolean }> & { message: string }>(`/admin/payments/${id}/refund`, input)
-  return { message: res.data.message, belowMinimum: res.data.data.belowMinimum }
+/** What a refund did, for the confirmation window. */
+export interface RefundResult {
+  message: string
+  /** The amount refunded in this action. */
+  total: number
+  /** processed = Razorpay has completed it, pending = Razorpay is working on it, recorded = noted in the records only. */
+  status: 'processed' | 'pending' | 'recorded'
+  /** Razorpay's reference for a single refund (more than one when it was spread over several payments). */
+  reference: string | null
+  payments: number
+  belowMinimum: boolean
+}
+
+/** Refunds all (leave `amount` out) or part of one paid payment. Razorpay payments are refunded through Razorpay. */
+export async function refundPayment(id: string, input: { amount?: number; reason: string }): Promise<RefundResult> {
+  const res = await api.post<
+    ApiEnvelope<{ belowMinimum: boolean; refund: { id: string | null; amount: number; status: string } }> & { message: string }
+  >(`/admin/payments/${id}/refund`, input)
+  const { refund, belowMinimum } = res.data.data
+  return {
+    message: res.data.message,
+    total: refund.amount,
+    status: refund.id ? (refund.status === 'pending' ? 'pending' : 'processed') : 'recorded',
+    reference: refund.id,
+    payments: 1,
+    belowMinimum,
+  }
 }
 
 /** Refunds some or all of everything one person has paid, newest payments first. Leave `amount` out for the lot. */
-export async function refundFee(input: { userId: string; amount?: number; reason: string }) {
-  const res = await api.post<ApiEnvelope<{ total: number; belowMinimum: boolean }> & { message: string }>('/admin/payments/refund-fee', input)
-  return { message: res.data.message, total: res.data.data.total, belowMinimum: res.data.data.belowMinimum }
+export async function refundFee(input: { userId: string; amount?: number; reason: string }): Promise<RefundResult> {
+  const res = await api.post<
+    ApiEnvelope<{ total: number; belowMinimum: boolean; refunds: { id: string | null; status: string }[] }> & { message: string }
+  >('/admin/payments/refund-fee', input)
+  const { refunds, total, belowMinimum } = res.data.data
+  const online = refunds.filter((r) => r.id)
+  return {
+    message: res.data.message,
+    total,
+    status: online.length === 0 ? 'recorded' : online.some((r) => r.status === 'pending') ? 'pending' : 'processed',
+    reference: online.length === 1 ? online[0].id : null,
+    payments: refunds.length,
+    belowMinimum,
+  }
 }

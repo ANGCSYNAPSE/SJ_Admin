@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Loader2, Undo2, X } from 'lucide-react'
-import { fetchPayments, refundFee, refundPayment, type PaymentRow } from '../../api/payments'
+import { CircleAlert, Loader2, Undo2, X } from 'lucide-react'
+import { fetchPayments, refundFee, refundPayment, type PaymentRow, type RefundResult } from '../../api/payments'
 import { apiErrorMessage } from '../../api/client'
 import { useToast } from '../ui/Toast'
 
@@ -37,6 +37,8 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Once the refund is made, the window turns into a confirmation instead of closing.
+  const [done, setDone] = useState<RefundResult | null>(null)
 
   const value = Number(amount)
   const valid = Number.isFinite(value) && value > 0 && value <= left
@@ -57,14 +59,71 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
           ? await refundFee({ userId: payment.userId, amount: value === left ? undefined : value, reason: reason.trim() })
           : await refundPayment(payment.id, { amount: value === left ? undefined : value, reason: reason.trim() })
       toast.success(res.message)
-      if (res.belowMinimum) toast.success('They are now below the minimum fee. You may want to un-verify or message them.')
+      setDone(res)
       onDone()
-      onClose()
     } catch (e) {
       setError(apiErrorMessage(e, 'Could not refund this payment.'))
     } finally {
       setBusy(false)
     }
+  }
+
+  if (done) {
+    const title = done.status === 'recorded' ? 'Refund recorded' : done.status === 'pending' ? 'Refund started' : 'Refund completed'
+    const statusLabel = done.status === 'recorded' ? 'Recorded' : done.status === 'pending' ? 'In progress at Razorpay' : 'Completed'
+    return (
+      <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-2xl bg-white px-6 pb-6 pt-8 text-center shadow-xl">
+          <span className="flex size-20 items-center justify-center rounded-full bg-green-100 ring-8 ring-green-50">
+            <svg viewBox="0 0 24 24" className="size-11 text-green-600" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
+          <div>
+            <p className="font-display text-2xl font-bold text-maroon">{title}</p>
+            <p className="mt-1 text-3xl font-bold text-heading">{rupees(done.total)}</p>
+            <p className="text-[13px] text-body">
+              to {payment.fullName}
+              {done.payments > 1 ? ` · across ${done.payments} payments` : ''}
+            </p>
+          </div>
+
+          <dl className="w-full divide-y divide-card-border-alt rounded-xl border border-card-border-alt text-left text-[13px]">
+            <div className="flex justify-between gap-3 px-4 py-2.5">
+              <dt className="text-muted">Status</dt>
+              <dd className="font-semibold text-green-700">{statusLabel}</dd>
+            </div>
+            {done.reference && (
+              <div className="flex justify-between gap-3 px-4 py-2.5">
+                <dt className="text-muted">Razorpay reference</dt>
+                <dd className="break-all text-right font-mono text-[12px] text-heading">{done.reference}</dd>
+              </div>
+            )}
+            <div className="flex justify-between gap-3 px-4 py-2.5">
+              <dt className="text-muted">Member</dt>
+              <dd className="text-heading">Notified in their bell and by email</dd>
+            </div>
+          </dl>
+
+          <p className="text-[12px] text-body">
+            {done.status === 'recorded'
+              ? 'This refund is noted in the records. Nothing was sent through Razorpay.'
+              : 'The money returns to the payer’s own bank, card or UPI account, usually within 5 to 7 working days. Razorpay keeps its own fee.'}
+          </p>
+
+          {done.belowMinimum && (
+            <p className="flex w-full items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-left text-[12px] text-amber-800">
+              <CircleAlert size={15} className="mt-0.5 shrink-0" />
+              They are now below the minimum fee. You may want to un-verify them or send a message.
+            </p>
+          )}
+
+          <button type="button" onClick={onClose} autoFocus className="w-full rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700">
+            Done
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
