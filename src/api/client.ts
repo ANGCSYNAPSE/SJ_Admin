@@ -38,8 +38,20 @@ export function setAccessToken(token: string | null) {
   accessToken = token
 }
 
-/** Exchanges the refresh cookie for a fresh access token; null if the session is gone. */
-async function refreshAccessToken(): Promise<string | null> {
+/**
+ * Exchanges the refresh cookie for a fresh access token; null if the session is gone. Calls that overlap (React's double
+ * render in development, a page and a retried request at once) share ONE request: the server swaps the cookie on every
+ * refresh, so two at the same moment would otherwise look like a replayed token.
+ */
+let refreshing: Promise<string | null> | null = null
+function refreshAccessToken(): Promise<string | null> {
+  refreshing ??= doRefresh().finally(() => {
+    refreshing = null
+  })
+  return refreshing
+}
+
+async function doRefresh(): Promise<string | null> {
   try {
     const res = await axios.post<ApiEnvelope<AuthResult>>(
       `${baseURL}/auth/refresh`,
