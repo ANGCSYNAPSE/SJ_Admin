@@ -80,7 +80,7 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
 
         <p className="rounded-lg bg-search-bg px-3 py-2 text-[12px] text-body">
           {mock
-            ? 'This is a leftover test payment from the old dummy checkout. Razorpay never received it, so nothing is sent to Razorpay and the member is not emailed. The refund is only recorded here.'
+            ? 'This is a leftover test payment from the old dummy checkout. Razorpay never received it, so nothing is sent to Razorpay. The refund is recorded here, and the member is still notified and emailed.'
             : online
             ? 'The money goes back to the payer’s own bank, card or UPI account through Razorpay, usually in 5 to 7 working days. Razorpay keeps its own fee. This cannot be undone.'
             : 'This payment was recorded by hand, so nothing is sent through Razorpay. Return the money yourself, this only updates the record.'}
