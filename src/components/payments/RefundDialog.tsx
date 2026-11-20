@@ -19,7 +19,9 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
 
   const value = Number(amount)
   const valid = Number.isFinite(value) && value > 0 && value <= left
-  const online = payment.source === 'razorpay'
+  // Leftover from the old dummy checkout: Razorpay never saw it, so the refund is only recorded here.
+  const mock = /^pay_mock_/.test(payment.razorpayPaymentId ?? '')
+  const online = payment.source === 'razorpay' && !mock
 
   async function submit() {
     if (reason.trim().length < 3) {
@@ -77,7 +79,9 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
         </div>
 
         <p className="rounded-lg bg-search-bg px-3 py-2 text-[12px] text-body">
-          {online
+          {mock
+            ? 'This is a leftover test payment from the old dummy checkout. Razorpay never received it, so nothing is sent to Razorpay and the member is not emailed. The refund is only recorded here.'
+            : online
             ? 'The money goes back to the payer’s own bank, card or UPI account through Razorpay, usually in 5 to 7 working days. Razorpay keeps its own fee. This cannot be undone.'
             : 'This payment was recorded by hand, so nothing is sent through Razorpay. Return the money yourself, this only updates the record.'}
         </p>
