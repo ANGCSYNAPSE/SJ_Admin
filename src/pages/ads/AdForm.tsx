@@ -24,6 +24,20 @@ const placementOptions: { label: string; slot: AdSlot }[] = [
   { label: 'Events Page', slot: 'banner' },
   { label: 'Temple Directory', slot: 'rectangle' },
   { label: 'Site-wide Popup', slot: 'rectangle' },
+  { label: 'Donation Page', slot: 'banner' },
+  { label: 'Initiatives Page', slot: 'banner' },
+  { label: 'About Page', slot: 'banner' },
+  { label: 'Dharamshala Page', slot: 'leaderboard' },
+  { label: 'Artists Page', slot: 'banner' },
+  { label: 'Organisations Page', slot: 'leaderboard' },
+  { label: 'Baba Shyam Page', slot: 'banner' },
+  { label: 'Registration Pages', slot: 'leaderboard' },
+]
+
+const slotOptions: { value: AdSlot; label: string }[] = [
+  { value: 'banner', label: 'Banner (970 × 250)' },
+  { value: 'leaderboard', label: 'Leaderboard (728 × 90)' },
+  { value: 'rectangle', label: 'Rectangle (300 × 250)' },
 ]
 
 type FormStatus = 'draft' | 'active' | 'paused'
@@ -88,6 +102,8 @@ export function AdForm() {
   const [status, setStatus] = useState<FormStatus>('draft')
   const [description, setDescription] = useState('')
   const [existingSlot, setExistingSlot] = useState<AdSlot | null>(null)
+  // The size can be chosen on its own: any page area can show a banner, a leaderboard or a rectangle.
+  const [slotChoice, setSlotChoice] = useState<AdSlot | ''>('')
 
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
@@ -114,6 +130,7 @@ export function AdForm() {
         setStatus(ad.isDraft ? 'draft' : ad.isActive ? 'active' : 'paused')
         setDescription(ad.description ?? '')
         setExistingSlot(ad.placement)
+        setSlotChoice(ad.placement)
       })
       .catch((err) => setError(apiErrorMessage(err, 'Failed to load this advertisement.')))
       .finally(() => {
@@ -160,7 +177,7 @@ export function AdForm() {
       title: title.trim(),
       advertiser: advertiser.trim() || undefined,
       adType: adType || undefined,
-      placement: area?.slot ?? existingSlot ?? 'banner',
+      placement: slotChoice || (area?.slot ?? existingSlot ?? 'banner'),
       page: placement || undefined,
       imageUrl,
       linkUrl: linkUrl.trim() || undefined,
@@ -232,6 +249,20 @@ export function AdForm() {
               <option value="">Select Placement Area</option>
               {placementChoices.map((o) => (
                 <option key={o.label} value={o.label}>
+                  {o.label}
+                </option>
+              ))}
+            </SelectField>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass} htmlFor="ad-slot">
+              Ad size
+            </label>
+            <SelectField id="ad-slot" value={slotChoice || (placementChoices.find((o) => o.label === placement)?.slot ?? existingSlot ?? '')} onChange={(v) => setSlotChoice(v as AdSlot)}>
+              <option value="">Choose the size</option>
+              {slotOptions.map((o) => (
+                <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
