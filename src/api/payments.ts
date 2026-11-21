@@ -127,14 +127,16 @@ export interface RefundResult {
   reference: string | null
   payments: number
   belowMinimum: boolean
+  /** Where the person stands afterwards. */
+  fee: { total: number; paid: number; balance: number; minimum: number }
 }
 
 /** Refunds all (leave `amount` out) or part of one paid payment. Razorpay payments are refunded through Razorpay. */
 export async function refundPayment(id: string, input: { amount?: number; reason: string }): Promise<RefundResult> {
   const res = await api.post<
-    ApiEnvelope<{ belowMinimum: boolean; refund: { id: string | null; amount: number; status: string } }> & { message: string }
+    ApiEnvelope<{ belowMinimum: boolean; fee: RefundResult['fee']; refund: { id: string | null; amount: number; status: string } }> & { message: string }
   >(`/admin/payments/${id}/refund`, input)
-  const { refund, belowMinimum } = res.data.data
+  const { refund, belowMinimum, fee } = res.data.data
   return {
     message: res.data.message,
     total: refund.amount,
@@ -142,15 +144,16 @@ export async function refundPayment(id: string, input: { amount?: number; reason
     reference: refund.id,
     payments: 1,
     belowMinimum,
+    fee,
   }
 }
 
 /** Refunds some or all of everything one person has paid, newest payments first. Leave `amount` out for the lot. */
 export async function refundFee(input: { userId: string; amount?: number; reason: string }): Promise<RefundResult> {
   const res = await api.post<
-    ApiEnvelope<{ total: number; belowMinimum: boolean; refunds: { id: string | null; status: string }[] }> & { message: string }
+    ApiEnvelope<{ total: number; belowMinimum: boolean; fee: RefundResult['fee']; refunds: { id: string | null; status: string }[] }> & { message: string }
   >('/admin/payments/refund-fee', input)
-  const { refunds, total, belowMinimum } = res.data.data
+  const { refunds, total, belowMinimum, fee } = res.data.data
   const online = refunds.filter((r) => r.id)
   return {
     message: res.data.message,
@@ -159,5 +162,6 @@ export async function refundFee(input: { userId: string; amount?: number; reason
     reference: online.length === 1 ? online[0].id : null,
     payments: refunds.length,
     belowMinimum,
+    fee,
   }
 }

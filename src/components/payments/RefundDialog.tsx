@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { CircleAlert, Loader2, Undo2, X } from 'lucide-react'
-import { fetchPayments, refundFee, refundPayment, type PaymentRow, type RefundResult } from '../../api/payments'
+import { fetchFeeSettings, fetchPayments, refundFee, refundPayment, type PaymentRow, type RefundResult } from '../../api/payments'
 import { apiErrorMessage } from '../../api/client'
+import { formatDate } from '../../lib/format'
 import { useToast } from '../ui/Toast'
 
 const rupees = (n: number) => `₹${n.toLocaleString('en-IN')}`
@@ -20,6 +21,17 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
       .then((page) => setOthers(page.items))
       .catch(() => setOthers([]))
   }, [payment.userId])
+  const [feeTotal, setFeeTotal] = useState<number | null>(null)
+  useEffect(() => {
+    fetchFeeSettings()
+      .then((settings) => setFeeTotal(settings.fee.total))
+      .catch(() => setFeeTotal(null))
+  }, [])
+  // Where this person stands now: what they paid, what has gone back, and what they still owe.
+  const paidGross = Math.round((others ?? []).reduce((sum, p) => sum + p.amount, 0) * 100) / 100
+  const refundedSoFar = Math.round((others ?? []).reduce((sum, p) => sum + (p.refunded ?? 0), 0) * 100) / 100
+  const paidNet = Math.round((paidGross - refundedSoFar) * 100) / 100
+  const balanceNow = feeTotal === null ? null : Math.max(Math.round((feeTotal - paidNet) * 100) / 100, 0)
   const refundable = (others ?? []).filter((p) => p.amount - (p.refunded ?? 0) > 0)
   const leftOnAll = Math.round(refundable.reduce((sum, p) => sum + (p.amount - (p.refunded ?? 0)), 0) * 100) / 100
   const canRefundAll = refundable.length > 1 && payment.userId !== null
@@ -100,6 +112,14 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
               </div>
             )}
             <div className="flex justify-between gap-3 px-4 py-2.5">
+              <dt className="text-muted">Counts as paid now</dt>
+              <dd className="font-semibold text-heading">{rupees(done.fee.paid)} of {rupees(done.fee.total)}</dd>
+            </div>
+            <div className="flex justify-between gap-3 px-4 py-2.5">
+              <dt className="text-muted">Balance still due</dt>
+              <dd className={`font-semibold ${done.fee.balance > 0 ? 'text-red-600' : 'text-green-700'}`}>{rupees(done.fee.balance)}</dd>
+            </div>
+            <div className="flex justify-between gap-3 px-4 py-2.5">
               <dt className="text-muted">Member</dt>
               <dd className="text-heading">Notified in their bell and by email</dd>
             </div>
@@ -147,6 +167,42 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
           </button>
         </div>
 
+        <div className="rounded-xl border border-card-border-alt bg-[#fffbf3] px-4 py-3 text-[13px]">
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">{payment.fullName.split(' ')[0]}&apos;s registration fee</p>
+          {others === null ? (
+            <p className="text-muted">Loading what they paid…</p>
+          ) : (
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+              <dt className="text-body">Registration fee</dt>
+              <dd className="text-right font-semibold text-heading">{feeTotal === null ? '–' : rupees(feeTotal)}</dd>
+              <dt className="text-body">Total paid (all payments)</dt>
+              <dd className="text-right font-semibold text-heading">{rupees(paidGross)}</dd>
+              <dt className="text-body">Total refunded</dt>
+              <dd className="text-right font-semibold text-red-600">{refundedSoFar > 0 ? `− ${rupees(refundedSoFar)}` : rupees(0)}</dd>
+              <dt className="border-t border-card-border-alt pt-1 text-body">Remaining (can still be refunded)</dt>
+              <dd className="border-t border-card-border-alt pt-1 text-right font-bold text-green-700">{rupees(paidNet)}</dd>
+              <dt className="text-body">Balance still due</dt>
+              <dd className={`text-right font-bold ${balanceNow && balanceNow > 0 ? 'text-red-600' : 'text-green-700'}`}>{balanceNow === null ? '–' : rupees(balanceNow)}</dd>
+            </dl>
+          )}
+          {others !== null && others.length > 0 && (
+            <ul className="mt-2.5 divide-y divide-card-border-alt border-t border-card-border-alt text-[12px]">
+              {others.map((p) => (
+                <li key={p.id} className={`flex items-center justify-between gap-3 py-1.5 ${p.id === payment.id ? 'font-semibold text-heading' : 'text-body'}`}>
+                  <span>
+                    {rupees(p.amount)} <span className="text-muted">paid {formatDate(p.paidAt ?? p.createdAt)}</span>
+                    {p.id === payment.id && <span className="ml-1.5 rounded-full bg-orange/15 px-1.5 py-0.5 text-[10px] font-bold text-orange">this one</span>}
+                  </span>
+                  <span className="text-right">
+                    {p.refunded > 0 && <span className="text-red-600">{rupees(p.refunded)} refunded · </span>}
+                    <b>{rupees(Math.round((p.amount - (p.refunded ?? 0)) * 100) / 100)} left</b>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         {canRefundAll && (
           <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="What to refund">
             {(
@@ -178,6 +234,18 @@ export function RefundDialog({ payment, onClose, onDone }: { payment: PaymentRow
             Amount to refund <span className="font-normal text-muted">(up to {rupees(left)})</span>
           </label>
           <input id="refund-amount" type="number" min={1} max={left} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className={inputClass} />
+          {valid && others !== null && (
+            <p className="rounded-lg bg-search-bg px-3 py-2 text-[12px] text-body">
+              After this refund:{' '}
+              <b className="text-heading">{rupees(Math.max(Math.round((paidNet - value) * 100) / 100, 0))} counts as paid</b>
+              {balanceNow !== null && feeTotal !== null && (
+                <>
+                  {' · '}
+                  balance due <b className="text-red-600">{rupees(Math.max(Math.round((feeTotal - (paidNet - value)) * 100) / 100, 0))}</b>
+                </>
+              )}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
