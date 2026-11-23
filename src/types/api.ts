@@ -116,6 +116,17 @@ export interface EventItem {
 }
 
 export type AdSlot = 'leaderboard' | 'banner' | 'rectangle'
+/** image = the picture is the whole ad; split = coloured panel with headline, text and button beside a picture. */
+export type AdTemplate = 'image' | 'split'
+export type AdTheme = 'maroon' | 'navy' | 'charcoal' | 'forest' | 'royal' | 'teal' | 'custom'
+
+/** How the ad slots on the site rotate (one set of rules for the whole site). */
+export interface AdRotation {
+  seconds: number
+  /** tiles = current ad in the middle with the next and previous behind it at the sides; fade = one ad at a time. */
+  transition: 'tiles' | 'fade'
+  pauseOnHover: boolean
+}
 
 export interface AdItem {
   id: string
@@ -124,9 +135,18 @@ export interface AdItem {
   adType: string | null
   placement: AdSlot
   page: string | null
-  imageUrl: string
+  imageUrl: string | null
   linkUrl: string | null
   ctaLabel: string | null
+  template: AdTemplate
+  headline: string | null
+  subline: string | null
+  theme: AdTheme
+  bgFrom: string | null
+  bgTo: string | null
+  ctaColor: string | null
+  /** The 1st, 2nd... spot of its size on the page (top to bottom); null = any spot. */
+  slotPosition: number | null
   isActive: boolean
   startsAt: string | null
   endsAt: string | null

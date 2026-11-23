@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom'
 import { Archive, Calendar, ChevronDown, ChevronLeft, ChevronRight, Coins, Megaphone, Play, Plus, Search, SquarePen, Trash2, type LucideIcon } from 'lucide-react'
 import { deleteAd, fetchAds, updateAd } from '../../api/ads'
 import { apiErrorMessage } from '../../api/client'
-import { adStatus, adStatusLabel, adTitle, formatRevenueLakhs, type AdStatus } from '../../lib/ads'
+import { adStatus, adStatusLabel, adTitle, formatRevenueLakhs, slotLabel, type AdStatus } from '../../lib/ads'
 import { formatDate } from '../../lib/format'
 import { AdStatusBadge } from '../../components/ads/AdStatusBadge'
+import { RotationSettings } from '../../components/ads/RotationSettings'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { Loader } from '../../components/ui/Loader'
 import type { AdItem } from '../../types/api'
@@ -160,6 +161,8 @@ export function Ads() {
         <KpiCard label="Revenue" value={formatRevenueLakhs(stats.revenue)} icon={Coins} tint="bg-maroon/10" iconColor="text-maroon" />
       </div>
 
+      <RotationSettings />
+
       <div className="flex items-center justify-between rounded-xl border border-card-border-alt bg-white p-5">
         <div className="flex items-center gap-4">
           <div className="flex w-60 items-center gap-2 rounded-lg border border-card-border-alt px-3.5 py-2">
@@ -258,8 +261,13 @@ export function Ads() {
               </div>
               <p className="flex-1 truncate pr-3 text-[13px] font-semibold text-heading">{adTitle(ad)}</p>
               <p className="w-40 shrink-0 truncate pr-2 text-[13px] text-body">{ad.advertiser ?? '—'}</p>
-              <p className="w-[120px] shrink-0 truncate pr-2 text-[13px] text-muted">{ad.adType ?? '—'}</p>
-              <p className="w-[140px] shrink-0 pr-2 text-[13px] text-body">{ad.page ?? '—'}</p>
+              <p className="w-[120px] shrink-0 truncate pr-2 text-[13px] text-muted">{ad.adType ?? (ad.template === 'split' ? 'Text + picture' : 'Picture only')}</p>
+              <div className="flex w-[140px] shrink-0 flex-col gap-0.5 pr-2">
+                <p className="text-[13px] text-body">{ad.page ?? 'All Pages'}</p>
+                <p className="text-[11px] text-muted">
+                  {slotLabel[ad.placement]} · {ad.slotPosition ? `${['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'][ad.slotPosition - 1]} spot` : 'any spot'}
+                </p>
+              </div>
               <div className="flex w-[150px] shrink-0 flex-col gap-0.5">
                 <p className="text-xs text-heading">{formatDate(ad.startsAt ?? ad.createdAt)}</p>
                 <p className="text-[11px] text-muted">{ad.endsAt ? `to ${formatDate(ad.endsAt)}` : 'No end date'}</p>

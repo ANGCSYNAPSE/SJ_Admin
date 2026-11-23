@@ -15,7 +15,15 @@ function normalizeBaseUrl(raw: string | undefined): string {
   return value
 }
 
-const baseURL = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL)
+/**
+ * A deployed admin does NOT call the backend's own address from the browser. It calls its own /api/v1/..., and Vercel
+ * forwards the request to the backend (see vercel.json). That makes the sign-in cookie first-party, so the session
+ * survives a page refresh in every browser: Safari, Brave and Chrome all drop the cookie of a different site, which
+ * is what sent the admin back to the login screen on every refresh. Running locally still talks to the backend directly.
+ */
+const rawBase = import.meta.env.VITE_API_BASE_URL
+const pointsAtThisMachine = /^(https?:\/\/)?(localhost|127\.0\.0\.1)/i.test((rawBase ?? '').trim())
+const baseURL = import.meta.env.PROD && !pointsAtThisMachine ? '/api/v1' : normalizeBaseUrl(rawBase)
 
 /** Origin the backend serves static /uploads from (baseURL minus the /api/v1 suffix). */
 export const apiOrigin = baseURL.replace(/\/api\/v1\/?$/, '')
@@ -53,11 +61,16 @@ function refreshAccessToken(): Promise<string | null> {
 
 async function doRefresh(): Promise<string | null> {
   try {
-    const res = await axios.post<ApiEnvelope<AuthResult>>(
+    const res = await axios.post<ApiEnvelope<AuthResult | null>>(
       `${baseURL}/auth/refresh`,
       {},
       { withCredentials: true },
     )
+    // data is null when there is no session cookie: nobody is signed in.
+    if (!res.data.data) {
+      setAccessToken(null)
+      return null
+    }
     const token = res.data.data.accessToken
     setAccessToken(token)
     return token
