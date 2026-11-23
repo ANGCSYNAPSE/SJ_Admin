@@ -18,11 +18,12 @@ import { Profile } from './pages/profile/Profile'
 import { Payments } from './pages/payments/Payments'
 import { Notifications } from './pages/notifications/Notifications'
 import { Verification } from './pages/verification/Verification'
+import { Volunteers } from './pages/volunteers/Volunteers'
 import { UserDetail } from './pages/users/UserDetail'
 import { ComingSoon } from './pages/ComingSoon'
 import { navItems } from './components/layout/navConfig'
 
-const builtPaths = new Set(['/', '/blog-posts', '/events', '/users', '/advertisement', '/registrations', '/payments', '/notifications', '/verification'])
+const builtPaths = new Set(['/', '/blog-posts', '/events', '/users', '/advertisement', '/registrations', '/payments', '/notifications', '/verification', '/volunteers'])
 const placeholderPaths = navItems.map((item) => item.path).filter((path) => !builtPaths.has(path))
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
           <Route path="/payments" element={<Payments />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/verification" element={<Verification />} />
+          <Route path="/volunteers" element={<Volunteers />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/new" element={<EventForm />} />

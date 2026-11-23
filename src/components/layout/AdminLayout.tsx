@@ -13,6 +13,7 @@ const titleOverrides: Record<string, string> = {
   '/payments': 'Registration Fee: Collected, Pending & Settings',
   '/notifications': 'Notification Centre: Message Devotees',
   '/verification': 'Account Verification: Email, Phone & Admin',
+  '/volunteers': 'Volunteers: Who Offered Their Time, and for Which Seva',
   '/profile': 'My Profile',
 }
 
