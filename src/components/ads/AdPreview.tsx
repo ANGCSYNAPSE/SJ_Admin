@@ -3,10 +3,12 @@ import { resolveUploadUrl } from '../../api/client'
 import type { AdSlot, AdTemplate, AdTheme } from '../../types/api'
 
 /** The real pixel size each slot has on the website. */
+// Every ad slot on the website is the same compact wide strip (728 × 90, scaled down on phones).
+const STRIP = { w: 728, h: 90 }
 export const SLOT_DIMS: Record<AdSlot, { w: number; h: number }> = {
-  leaderboard: { w: 728, h: 90 },
-  banner: { w: 970, h: 250 },
-  rectangle: { w: 300, h: 250 },
+  leaderboard: STRIP,
+  banner: STRIP,
+  rectangle: STRIP,
 }
 
 export const THEME_COLOURS: Record<Exclude<AdTheme, 'custom'>, [string, string]> = {
@@ -88,9 +90,9 @@ function Creative({ ad, size }: { ad: AdPreviewData; size: AdSlot }) {
     )
   }
 
-  const look = LOOK[size]
+  const look = LOOK.leaderboard
   const [from, to] = themeColours(ad.theme, ad.bgFrom, ad.bgTo)
-  const stacked = size === 'rectangle'
+  const stacked = false
   const cta = ad.ctaLabel.trim() || (ad.hasLink ? 'Learn more' : '')
   const tone = buttonColours(ad.theme, ad.ctaColor)
 

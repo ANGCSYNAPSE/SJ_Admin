@@ -61,9 +61,9 @@ const AREA_SPOTS: Record<string, Partial<Record<AdSlot, number>>> = {
 const ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th']
 
 const slotOptions: { value: AdSlot; label: string }[] = [
-  { value: 'banner', label: 'Banner (970 × 250)' },
-  { value: 'leaderboard', label: 'Leaderboard (728 × 90)' },
-  { value: 'rectangle', label: 'Rectangle (300 × 250)' },
+  { value: 'banner', label: 'Banner spot' },
+  { value: 'leaderboard', label: 'Leaderboard spot' },
+  { value: 'rectangle', label: 'Rectangle spot' },
 ]
 
 type FormStatus = 'draft' | 'active' | 'paused'
@@ -338,7 +338,7 @@ export function AdForm() {
               Ad size
             </label>
             <SelectField id="ad-slot" value={slotChoice || (placementChoices.find((o) => o.label === placement)?.slot ?? existingSlot ?? '')} onChange={(v) => setSlotChoice(v as AdSlot)}>
-              <option value="">Choose the size</option>
+              <option value="">Choose the spot type (all ads show at the same size)</option>
               {slotOptions.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
