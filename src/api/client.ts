@@ -23,7 +23,8 @@ function normalizeBaseUrl(raw: string | undefined): string {
  */
 const rawBase = import.meta.env.VITE_API_BASE_URL
 const pointsAtThisMachine = /^(https?:\/\/)?(localhost|127\.0\.0\.1)/i.test((rawBase ?? '').trim())
-const baseURL = import.meta.env.PROD && !pointsAtThisMachine ? '/api/v1' : normalizeBaseUrl(rawBase)
+// In development too (vite.config.ts forwards /api and /uploads to the backend), so the cookie is first-party there as well.
+const baseURL = !pointsAtThisMachine ? '/api/v1' : normalizeBaseUrl(rawBase)
 
 /** Origin the backend serves static /uploads from (baseURL minus the /api/v1 suffix). */
 export const apiOrigin = baseURL.replace(/\/api\/v1\/?$/, '')
