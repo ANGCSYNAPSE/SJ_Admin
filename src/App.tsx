@@ -19,6 +19,7 @@ import { Payments } from './pages/payments/Payments'
 import { Notifications } from './pages/notifications/Notifications'
 import { Verification } from './pages/verification/Verification'
 import { Volunteers } from './pages/volunteers/Volunteers'
+import { Gallery } from './pages/gallery/Gallery'
 import { UserDetail } from './pages/users/UserDetail'
 import { ComingSoon } from './pages/ComingSoon'
 import { navItems } from './components/layout/navConfig'
@@ -51,6 +52,7 @@ function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/verification" element={<Verification />} />
           <Route path="/volunteers" element={<Volunteers />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/new" element={<EventForm />} />

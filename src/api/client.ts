@@ -39,6 +39,16 @@ export const api = axios.create({
   withCredentials: true, // sends/receives the httpOnly refresh cookie
 })
 
+// Anything an admin changes (an approval, a rejection, a reply) may change what is still waiting, so the badges on the menu
+// are asked to read their numbers again (see components/layout/usePendingCounts.ts).
+api.interceptors.response.use((response) => {
+  const method = response.config.method?.toLowerCase()
+  if (method && method !== 'get' && (response.config.url ?? '').startsWith('/admin')) {
+    window.dispatchEvent(new Event('admin:pending-changed'))
+  }
+  return response
+})
+
 let accessToken: string | null = null
 let refreshPromise: Promise<string | null> | null = null
 

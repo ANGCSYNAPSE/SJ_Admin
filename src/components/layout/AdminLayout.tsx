@@ -14,6 +14,7 @@ const titleOverrides: Record<string, string> = {
   '/notifications': 'Notification Centre: Message Devotees',
   '/verification': 'Account Verification: Email, Phone & Admin',
   '/volunteers': 'Volunteers: Who Offered Their Time, and for Which Seva',
+  '/gallery': 'Gallery: Photos and Videos Waiting for Approval',
   '/profile': 'My Profile',
 }
 

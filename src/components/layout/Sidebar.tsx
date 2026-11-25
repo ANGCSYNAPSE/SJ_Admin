@@ -3,9 +3,11 @@ import { NavLink } from 'react-router-dom'
 import brandLogo from '../../assets/logo-footer.png'
 import { useAuth } from '../../context/AuthContext'
 import { navItems } from './navConfig'
+import { usePendingCounts } from './usePendingCounts'
 
 export function Sidebar() {
   const { logout } = useAuth()
+  const pending = usePendingCounts()
 
   return (
     <aside className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-sidebar-border bg-sidebar ">
@@ -18,7 +20,9 @@ export function Sidebar() {
       <div className="border-t border-sidebar-border" />
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4 scrollbar-none">
-        {navItems.map(({ label, path, icon: Icon }) => (
+        {navItems.map(({ label, path, icon: Icon, pending: key }) => {
+          const count = key && pending ? pending[key] : 0
+          return (
           <NavLink
             key={path}
             to={path}
@@ -32,9 +36,19 @@ export function Sidebar() {
             }
           >
             <Icon size={18} strokeWidth={2} className="shrink-0" />
-            <span>{label}</span>
+            <span className="flex-1">{label}</span>
+            {count > 0 && (
+              <span
+                aria-label={`${count} waiting for approval`}
+                title={`${count} waiting for approval`}
+                className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold leading-none text-white shadow-sm"
+              >
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
           </NavLink>
-        ))}
+          )
+        })}
       </nav>
 
       <div className="border-t border-sidebar-border flex flex-col items-center gap-2.5 pb-2">
